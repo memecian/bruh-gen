@@ -1,13 +1,32 @@
 #!/bin/bash
 
-read -p "Recipient of the certificate: " RECIPIENT
-read -p "Time of the bruh moment (e.g., 2025-01-18T14:00:00Z): " BRUH_TIME
-read -p "Bruh severity (1: bruh moment/2: bruh cascade/3: epic bruh moment): " BRUH_SEVERITY
-read -p "Bruh moment reason: " BRUH_REASON
-read -p "Enter your name (certifier's name): " BRUH_CERTIFIER
+# Flag list:
+# -h : Help
+# -i : Interactive mode
+# -u : do not sign the certificate with GPG key
+# -o : output file name (default: $RECIPIENT-$TIME_OF_CERTIFICATION.txt)
+# ---
+# Non-interactive mode:
+# -r : Recipient of the certificate
+# -t : Time of the bruh moment
+# -s : Bruh severity (1: bruh moment/2: bruh cascade/3: epic bruh moment)
+# -c : Bruh moment reason
+# -n : Certifier's name
+
+# Interactive mode
+interactive_inputs() {
+    read -p "Recipient of the certificate: " RECIPIENT
+    read -p "Time of the bruh moment (e.g., 2025-01-18T14:00:00Z): " BRUH_TIME
+    read -p "Bruh severity (1: bruh moment/2: bruh cascade/3: epic bruh moment): " BRUH_SEVERITY
+    read -p "Bruh moment reason: " BRUH_REASON
+    read -p "Enter your name (certifier's name): " BRUH_CERTIFIER
+}
+
 
 TIME_OF_CERTIFICATION=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-OUTPUT_FILE="bruh_certificate.txt"
+OUTPUT_FILE=""
+
+
 
 # Generate the certificate message
 {
@@ -18,13 +37,13 @@ OUTPUT_FILE="bruh_certificate.txt"
     echo "$RECIPIENT has caused, triggered, or experienced:"
     case $BRUH_SEVERITY in
 	2)
-        echo "   - A certified cascade of bruh moments,"
+        echo "  a certified cascade of bruh moments,"
 		;;
 	3)
-        echo "   - A bruh moment of epic proportions,"
+        echo "  a bruh moment of epic proportions,"
         ;;
 	*)
-        echo "   - A certified bruh moment,"
+        echo "  a certified bruh moment,"
 		;;
     esac
     echo
