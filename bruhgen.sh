@@ -13,6 +13,44 @@
 # -c : Bruh moment reason
 # -n : Certifier's name
 
+while getopts "hiur:t:s:c:n:o:" opt; do
+    case $opt in
+        h)
+            echo "Usage: bruhgen.sh [-i] [-u] [-r RECIPIENT] [-t TIME] [-s SEVERITY] [-c REASON] [-n CERTIFIER] [-o OUTPUT_FILE]"
+            exit 0
+            ;;
+        i)
+            INTERACTIVE="true"
+            interactive_inputs
+            ;;
+        u)
+            UNSIGNED="true"
+            ;;
+        r)
+            RECIPIENT=$OPTARG
+            ;;
+        t)
+            BRUH_TIME=$OPTARG
+            ;;
+        s)
+            BRUH_SEVERITY=$OPTARG
+            ;;
+        c)
+            BRUH_REASON=$OPTARG
+            ;;
+        n)
+            BRUH_CERTIFIER=$OPTARG
+            ;;
+        o)
+            OUTPUT_FILE=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: $OPTARG" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
 # Interactive mode
 interactive_inputs() {
     read -p "Recipient of the certificate: " RECIPIENT
@@ -22,11 +60,8 @@ interactive_inputs() {
     read -p "Enter your name (certifier's name): " BRUH_CERTIFIER
 }
 
-
 TIME_OF_CERTIFICATION=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-OUTPUT_FILE=""
-
-
+OUTPUT_FILE="${RECIPIENT}-${TIME_OF_CERTIFICATION}.txt"
 
 # Generate the certificate message
 {
@@ -59,14 +94,22 @@ OUTPUT_FILE=""
     echo "Certified by: $BRUH_CERTIFIER"
 } > "$OUTPUT_FILE"
 
-read -p "Do you want to sign the certificate with your GPG key? (yes/no): " SIGN_CHOICE
-
-if [[ $SIGN_CHOICE == "yes" ]]; then
-    gpg --armor --detach-sign --output "$OUTPUT_FILE.asc" "$OUTPUT_FILE"
-    echo >> "$OUTPUT_FILE"
-    cat "$OUTPUT_FILE.asc" >> "$OUTPUT_FILE"
-    rm "$OUTPUT_FILE.asc"
-    echo "Certificate generated and signed: $OUTPUT_FILE"
+if [[ $UNSIGNED != "true" ]]; then
+    if [[ $INTERACTIVE == "true" ]]; then
+        read -p "Do you want to sign the certificate with your GPG key? (yes/no): " SIGN_CHOICE
+    fi
+    if [[ $SIGN_CHOICE == "yes" ]]; then
+        gpg --armor --detach-sign --output "$OUTPUT_FILE.asc" "$OUTPUT_FILE"
+        echo >> "$OUTPUT_FILE"
+        cat "$OUTPUT_FILE.asc" >> "$OUTPUT_FILE"
+        rm "$OUTPUT_FILE.asc"
+        echo "Certificate generated and signed: $OUTPUT_FILE"
+    else
+        echo "Certificate generated without signature: $OUTPUT_FILE"
+    fi
 else
     echo "Certificate generated without signature: $OUTPUT_FILE"
+    exit 0
 fi
+
+
