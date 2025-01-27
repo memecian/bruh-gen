@@ -13,45 +13,6 @@
 # -c : Bruh moment reason
 # -n : Certifier's name
 
-while getopts "hiur:t:s:c:n:o:" opt; do
-    case $opt in
-        h)
-            echo "Usage: bruhgen.sh [-i] [-u] [-r RECIPIENT] [-t TIME] [-s SEVERITY] [-c REASON] [-n CERTIFIER] [-o OUTPUT_FILE]"
-            exit 0
-            ;;
-        i)
-            INTERACTIVE="true"
-            interactive_inputs
-            ;;
-        u)
-            UNSIGNED="true"
-            ;;
-        r)
-            RECIPIENT=$OPTARG
-            ;;
-        t)
-            BRUH_TIME=$OPTARG
-            ;;
-        s)
-            BRUH_SEVERITY=$OPTARG
-            ;;
-        c)
-            BRUH_REASON=$OPTARG
-            ;;
-        n)
-            BRUH_CERTIFIER=$OPTARG
-            ;;
-        o)
-            OUTPUT_FILE=$OPTARG
-            ;;
-        \?)
-            echo "Invalid option: $OPTARG" 1>&2
-            exit 1
-            ;;
-    esac
-done
-
-# Interactive mode
 interactive_inputs() {
     read -p "Recipient of the certificate: " RECIPIENT
     read -p "Time of the bruh moment (e.g., 2025-01-18T14:00:00Z): " BRUH_TIME
@@ -60,12 +21,79 @@ interactive_inputs() {
     read -p "Enter your name (certifier's name): " BRUH_CERTIFIER
 }
 
+if [[ $# -eq 0 ]]; then
+    echo "Usage: bruhgen.sh [-i] [-u] [-r RECIPIENT] [-t TIME] [-s SEVERITY] [-c REASON] [-n CERTIFIER] [-o OUTPUT_FILE]"
+    exit 1
+fi
+
+while getopts "hiur:t:s:c:n:o:" opt; do
+    case $opt in
+        i)
+            INTERACTIVE="true"
+            interactive_inputs
+            ;;
+        u)
+            UNSIGNED="true"
+            ;;
+        r)
+            if [[ $OPTARG == "" ]]; then
+                echo "Recipient cannot be empty." 1>&2
+                exit 1
+            fi
+            RECIPIENT=$OPTARG
+            ;;
+        t)
+            if [[ $OPTARG == "" ]]; then
+            echo "Time of the bruh moment cannot be empty." 1>&2
+            exit 1
+            fi
+            BRUH_TIME=$OPTARG
+            ;;
+        s)
+            if [[ $OPTARG == "" ]]; then
+            echo "Bruh severity cannot be empty." 1>&2
+            exit 1
+            fi
+            BRUH_SEVERITY=$OPTARG
+            ;;
+        c)
+            if [[ $OPTARG == "" ]]; then
+            echo "Bruh moment reason cannot be empty." 1>&2
+            exit 1
+            fi
+            BRUH_REASON=$OPTARG
+            ;;
+        n)
+            if [[ $OPTARG == "" ]]; then
+            echo "Certifier's name cannot be empty." 1>&2
+            exit 1
+            fi
+            BRUH_CERTIFIER=$OPTARG
+            ;;
+        o)
+            if [[ $OPTARG == "" ]]; then
+            echo "Output file name cannot be empty." 1>&2
+            exit 1
+            fi
+            OUTPUT_FILE=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: $OPTARG" 1>&2
+            exit 1
+            ;;     
+        h)
+            echo "Usage: bruhgen.sh [-i] [-u] [-r RECIPIENT] [-t TIME] [-s SEVERITY] [-c REASON] [-n CERTIFIER] [-o OUTPUT_FILE]"
+            exit 0
+            ;;
+    esac
+done
+
 TIME_OF_CERTIFICATION=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 OUTPUT_FILE="${RECIPIENT}-${TIME_OF_CERTIFICATION}.txt"
 
 # Generate the certificate message
 {
-    figlet -f mini "CERTIFICATE OF BRUH"
+    figlet -f mini "{ CERTIFICATE OF BRUH }"
     echo
     echo "TO WHOM IT MAY CONCERN,"
     echo
