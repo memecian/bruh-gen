@@ -16,4 +16,3 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           files: '**/*.sh'
-          
